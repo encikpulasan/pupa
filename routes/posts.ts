@@ -41,7 +41,7 @@ publicRouter.get("/:id", async (ctx) => {
   }
 
   const kv = getKv();
-  const post = await kv.get([KV_COLLECTIONS.POSTS, id]);
+  const post = await kv.get<any>([KV_COLLECTIONS.POSTS, id]);
 
   if (!post.value) {
     ctx.response.status = 404;
@@ -142,7 +142,7 @@ adminRouter.get("/:id", async (ctx) => {
   }
 
   const kv = getKv();
-  const post = await kv.get([KV_COLLECTIONS.POSTS, id]);
+  const post = await kv.get<any>([KV_COLLECTIONS.POSTS, id]);
 
   if (!post.value) {
     ctx.response.status = 404;
