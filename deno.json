@@ -7,10 +7,13 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
+  },
+  "deploy": {
+    "project": "54b6779c-993f-43ab-98b9-e479c01d9d24",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "main.ts"
   }
 }
-
-
-
-
-
