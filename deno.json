@@ -3,7 +3,8 @@
     "dev": "denon run --watch --unstable-kv -A main.ts",
     "seed": "deno run --unstable-kv scripts/seed.ts",
     "export": "deno run --unstable-kv scripts/export_to_csv.ts",
-    "import": "deno run --unstable-kv scripts/import_from_csv.ts"
+    "import": "deno run --unstable-kv scripts/import_from_csv.ts",
+    "init": "deno run --unstable-kv -A scripts/init_deploy.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
