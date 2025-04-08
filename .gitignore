@@ -1,0 +1,58 @@
+# Deno cache and runtime files
+/.deno/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep environment example
+# !.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+
+# Coverage directory
+coverage/
+
+# IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+backups/
+postman/
+
+# SSL certificates (shouldn't be in repo)
+*.pem
+*.key
+*.crt
+
+# Local development database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Keep necessary files for Deno Deploy
+!deno.json
+!deno.lock
+!import_map.json
