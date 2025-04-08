@@ -1,8 +1,8 @@
 // init_deploy.ts - Run this script on deployment to ensure initial data
 
 import { connect, getKv, KV_COLLECTIONS } from "../db/kv.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { load } from "https://deno.land/std@0.185.0/dotenv/mod.ts";
+import { hashPassword } from "../utils/password.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -31,7 +31,7 @@ async function initializeDeployment() {
     // Hash password
     const defaultPassword = Deno.env.get("DEFAULT_ADMIN_PASSWORD") ||
       "admin123";
-    const hashedPassword = await bcrypt.hash(defaultPassword);
+    const hashedPassword = await hashPassword(defaultPassword);
 
     // Create admin user
     const adminUser = {

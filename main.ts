@@ -9,7 +9,6 @@ import {
 } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
 import { Status } from "https://deno.land/std@0.185.0/http/http_status.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { create, verify } from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { load } from "https://deno.land/std@0.185.0/dotenv/mod.ts";
 import { connect, getKv, KV_COLLECTIONS } from "./db/kv.ts";
@@ -30,6 +29,7 @@ import dbViewerRoutes from "./db-viewer.ts";
 import { initializeScheduler } from "./services/scheduler.ts";
 import { getPostAnalytics, trackView } from "./services/analytics.ts";
 import dashboardAnalyticsRoutes from "./routes/dashboardAnalytics.ts";
+import { hashPassword } from "./utils/password.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -60,8 +60,8 @@ async function initAdminUser() {
   if (!userExists) {
     console.log("No users found. Creating default admin user...");
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash("admin123");
+    // Hash password with native crypto
+    const hashedPassword = await hashPassword("admin123");
 
     // Create admin user
     const adminUser = {

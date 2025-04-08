@@ -2,9 +2,9 @@
 
 import { Router } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { getKv, KV_COLLECTIONS } from "../db/kv.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { create, verify } from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { logSuspiciousActivity } from "../middleware/logging.ts";
+import { hashPassword, verifyPassword } from "../utils/password.ts";
 
 const router = new Router();
 
@@ -71,8 +71,8 @@ router.post("/login", async (ctx) => {
     return;
   }
 
-  // Verify password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  // Verify password using our native crypto implementation
+  const isPasswordValid = await verifyPassword(password, user.password);
   if (!isPasswordValid) {
     ctx.response.status = 401;
     ctx.response.body = { error: "Invalid credentials" };
@@ -142,7 +142,7 @@ router.post("/verify", async (ctx) => {
 
     // Check if user still exists and has the same role
     const kv = getKv();
-    const user = await kv.get<any>([KV_COLLECTIONS.USERS, payload.id]);
+    const user = await kv.get<any>([KV_COLLECTIONS.USERS, payload.id as string]);
 
     if (!user.value || user.value.role !== payload.role) {
       ctx.response.status = 401;
@@ -173,11 +173,16 @@ router.post("/logout", async (ctx) => {
 
     const kv = getKv();
 
+    // Extract expiration safely
+    const expiration = payload.exp ? 
+      new Date(payload.exp * 1000).toISOString() : 
+      new Date(Date.now() + 86400000).toISOString(); // Default to 24 hours from now
+
     // Blacklist the token
     await kv.set([KV_COLLECTIONS.BLACKLISTED_TOKENS, token], {
       userId: payload.id,
       jti: payload.jti,
-      expiresAt: new Date(payload.exp * 1000).toISOString(),
+      expiresAt: expiration,
       revokedAt: new Date().toISOString(),
     });
 
@@ -237,7 +242,7 @@ router.post("/change-password", async (ctx) => {
 
     // Get user from KV
     const kv = getKv();
-    const user = await kv.get<any>([KV_COLLECTIONS.USERS, payload.id]);
+    const user = await kv.get<any>([KV_COLLECTIONS.USERS, payload.id as string]);
 
     if (!user.value) {
       ctx.response.status = 404;
@@ -246,40 +251,50 @@ router.post("/change-password", async (ctx) => {
     }
 
     // Verify current password
-    const isPasswordValid = await bcrypt.compare(
+    const isPasswordValid = await verifyPassword(
       currentPassword,
-      user.value.password,
+      user.value.password
     );
+
     if (!isPasswordValid) {
       ctx.response.status = 401;
       ctx.response.body = { error: "Current password is incorrect" };
+
+      // Log suspicious activity
+      logSuspiciousActivity({
+        type: "FAILED_PASSWORD_CHANGE",
+        userId: user.value.id,
+        ip: ctx.request.ip,
+        reason: "Invalid current password",
+      });
+
       return;
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword);
+    const hashedPassword = await hashPassword(newPassword);
 
-    // Update user
+    // Update user's password
     const updatedUser = {
       ...user.value,
       password: hashedPassword,
       updatedAt: new Date().toISOString(),
     };
 
-    await kv.set([KV_COLLECTIONS.USERS, payload.id], updatedUser);
+    await kv.set([KV_COLLECTIONS.USERS, user.value.id], updatedUser);
 
     // Log password change
     await kv.set([KV_COLLECTIONS.AUDIT, "auth", crypto.randomUUID()], {
-      action: "CHANGE_PASSWORD",
-      userId: payload.id,
+      action: "PASSWORD_CHANGE",
+      userId: user.value.id,
       timestamp: new Date().toISOString(),
       ip: ctx.request.ip,
     });
 
-    ctx.response.body = { success: true };
+    ctx.response.body = { success: true, message: "Password changed successfully" };
   } catch (err) {
     ctx.response.status = 401;
-    ctx.response.body = { error: "Invalid token" };
+    ctx.response.body = { error: "Unauthorized" };
   }
 });
 
