@@ -80,13 +80,107 @@ to:
 - **RESTful Endpoints**: Follows REST principles for intuitive API design
 - **JSON Communication**: Standard JSON request/response format
 - **Stateless Operation**: Maintains RESTful stateless operation
-- **Comprehensive Documentation**: Well-documented API endpoints
+- **Comprehensive Documentation**: Well-documented API endpoints via
+  Swagger/OpenAPI
+
+## Getting Started
+
+### Prerequisites
+
+- [Deno](https://deno.land/) v1.32.0 or higher
+- A text editor (VS Code recommended with Deno extension)
+
+### Local Development
+
+1. Clone the repository
+   ```bash
+   git clone <repository-url>
+   cd charity-shelter-api
+   ```
+
+2. Create a `.env` file based on `.env.example`
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Run the development server
+   ```bash
+   deno task dev
+   ```
+
+4. Access the API documentation at http://localhost:8000/api-docs
+
+### Available Tasks
+
+The project includes several predefined tasks in `deno.json`:
+
+- `deno task dev` - Run the development server with hot-reload
+- `deno task seed` - Populate the database with sample data
+- `deno task export` - Export data to CSV format
+- `deno task import` - Import data from CSV files
+- `deno task init` - Initialize the database with admin user (useful for
+  deployment)
 
 ## Deployment
 
-- **HTTP/HTTPS Support**: Configurable for both HTTP and HTTPS
-- **Environment Flexibility**: Can run locally for development or in production
-- **Containerization Ready**: Suitable for containerized deployment
+### Deploying to Deno Deploy
+
+1. Fork or clone this repository
+2. Sign up for [Deno Deploy](https://deno.com/deploy)
+3. Create a new project and link your repository
+4. Set the entry point to `main.ts`
+5. (Optional) Configure environment variables:
+   - `API_KEY`: Custom API key for authentication
+   - `JWT_SECRET`: Secret key for JWT token generation
+   - `DEFAULT_ADMIN_PASSWORD`: Custom password for the default admin user
+
+### Default Admin User
+
+On first deployment, the application automatically creates a default admin user:
+
+- **Email**: admin@charityshelter.org
+- **Password**: admin123 (or the value set in `DEFAULT_ADMIN_PASSWORD`
+  environment variable)
+- **API Key**: Automatically generated (check deployment logs)
+
+**IMPORTANT**: For security reasons, change the default admin password
+immediately after first login.
+
+### Manual Database Initialization
+
+If needed, you can manually initialize the database with:
+
+```bash
+deno task init
+```
+
+This will create the default admin user if no users exist in the database.
+
+## Project Structure
+
+```
+charity-shelter-api/
+├── .env.example        # Example environment variables
+├── db/                 # Database connection and utilities
+├── middleware/         # Application middleware
+├── public/             # Static files
+├── routes/             # API routes
+├── scripts/            # Utility scripts
+├── services/           # Business logic services
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+├── deno.json           # Deno configuration
+├── main.ts             # Application entry point
+└── readme.md           # This documentation
+```
+
+## Security Considerations
+
+- All passwords are securely hashed using SHA-256 with unique salts
+- JWT tokens are signed with HMAC-SHA512
+- API endpoints are protected with rate limiting
+- Tokens are blacklisted on logout
+- All user actions are logged for audit purposes
 
 ---
 
