@@ -100,7 +100,8 @@ export async function getOrganization(
   id: string,
 ): Promise<Organization | null> {
   const kv = getKv();
-  return await kv.get<Organization>([KV_COLLECTIONS.ORGANIZATIONS, id]);
+  const result = await kv.get<Organization>([KV_COLLECTIONS.ORGANIZATIONS, id]);
+  return result.value;
 }
 
 export async function getPublicOrganization(
@@ -199,7 +200,8 @@ export async function createBranch(
 
 export async function getBranch(id: string): Promise<Branch | null> {
   const kv = getKv();
-  return await kv.get<Branch>([KV_COLLECTIONS.BRANCHES, id]);
+  const result = await kv.get<Branch>([KV_COLLECTIONS.BRANCHES, id]);
+  return result.value;
 }
 
 export async function getOrganizationBranches(

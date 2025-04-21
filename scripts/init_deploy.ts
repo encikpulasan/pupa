@@ -3,6 +3,7 @@
 import { connect, getKv, KV_COLLECTIONS } from "../db/kv.ts";
 import { load } from "https://deno.land/std@0.185.0/dotenv/mod.ts";
 import { hashPassword } from "../utils/password.ts";
+import { User } from "../types/user.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -16,10 +17,10 @@ async function initializeDeployment() {
   console.log("Starting deployment initialization...");
 
   // Check if users exist
-  const userEntries = kv.list<any>({ prefix: [KV_COLLECTIONS.USERS] });
+  const userEntries = kv.list<User>({ prefix: [KV_COLLECTIONS.USERS] });
   let userExists = false;
 
-  for await (const entry of userEntries) {
+  for await (const _entry of userEntries) {
     userExists = true;
     break;
   }

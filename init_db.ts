@@ -3,6 +3,7 @@
 import { connect, getKv, KV_COLLECTIONS } from "./db/kv.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { load } from "https://deno.land/std@0.185.0/dotenv/mod.ts";
+import { User } from "./types/user.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -12,7 +13,7 @@ await connect();
 const kv = getKv();
 
 // Check if admin user already exists
-const entries = kv.list<any>({ prefix: [KV_COLLECTIONS.USERS] });
+const entries = kv.list<User>({ prefix: [KV_COLLECTIONS.USERS] });
 let adminExists = false;
 
 for await (const entry of entries) {
