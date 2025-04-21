@@ -75,6 +75,10 @@ const redocUi = `
                         tags: ["bookings", "public-bookings"]
                     },
                     {
+                        name: "Donations",
+                        tags: ["donations"]
+                    },
+                    {
                         name: "Roles & Permissions",
                         tags: ["roles"]
                     },
@@ -179,6 +183,10 @@ const apiSpec = {
     {
       name: "test",
       description: "Test endpoints for development and debugging",
+    },
+    {
+      name: "donations",
+      description: "Donation campaign management and processing",
     },
   ],
   servers: [
@@ -544,6 +552,317 @@ const apiSpec = {
           },
           isMainBranch: {
             type: "boolean",
+          },
+        },
+      },
+      DonationCampaign: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "campaign-123",
+          },
+          title: {
+            type: "string",
+            example: "Emergency Shelter Fund",
+          },
+          description: {
+            type: "string",
+            example: "Help us provide emergency shelter for families in need",
+          },
+          organizationId: {
+            type: "string",
+            example: "org-456",
+          },
+          type: {
+            type: "string",
+            enum: ["monetary", "supplies", "volunteer"],
+            example: "monetary",
+          },
+          goal: {
+            type: "number",
+            example: 5000.00,
+          },
+          amountRaised: {
+            type: "number",
+            example: 2750.00,
+          },
+          donorCount: {
+            type: "number",
+            example: 35,
+          },
+          currency: {
+            type: "string",
+            example: "USD",
+          },
+          startDate: {
+            type: "string",
+            format: "date",
+            example: "2023-06-01",
+          },
+          endDate: {
+            type: "string",
+            format: "date",
+            example: "2023-12-31",
+          },
+          isActive: {
+            type: "boolean",
+            example: true,
+          },
+          allowAnonymous: {
+            type: "boolean",
+            example: true,
+          },
+          minimumAmount: {
+            type: "number",
+            example: 5.00,
+          },
+          suggestedAmounts: {
+            type: "array",
+            items: {
+              type: "number",
+            },
+            example: [10, 25, 50, 100, 250],
+          },
+          featuredImage: {
+            type: "string",
+            example: "https://example.com/images/donation-campaign.jpg",
+          },
+          tags: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["emergency", "shelter", "families"],
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2023-06-01T12:00:00Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2023-06-01T12:00:00Z",
+          },
+        },
+      },
+      DonationCampaignInput: {
+        type: "object",
+        required: [
+          "title",
+          "description",
+          "organizationId",
+          "type",
+          "goal",
+          "currency",
+        ],
+        properties: {
+          title: {
+            type: "string",
+            example: "Emergency Shelter Fund",
+          },
+          description: {
+            type: "string",
+            example: "Help us provide emergency shelter for families in need",
+          },
+          organizationId: {
+            type: "string",
+            example: "org-456",
+          },
+          type: {
+            type: "string",
+            enum: ["monetary", "supplies", "volunteer"],
+            example: "monetary",
+          },
+          goal: {
+            type: "number",
+            example: 5000.00,
+          },
+          currency: {
+            type: "string",
+            example: "USD",
+          },
+          startDate: {
+            type: "string",
+            format: "date",
+            example: "2023-06-01",
+          },
+          endDate: {
+            type: "string",
+            format: "date",
+            example: "2023-12-31",
+          },
+          isActive: {
+            type: "boolean",
+            example: true,
+          },
+          allowAnonymous: {
+            type: "boolean",
+            example: true,
+          },
+          minimumAmount: {
+            type: "number",
+            example: 5.00,
+          },
+          suggestedAmounts: {
+            type: "array",
+            items: {
+              type: "number",
+            },
+            example: [10, 25, 50, 100, 250],
+          },
+          featuredImage: {
+            type: "string",
+            example: "https://example.com/images/donation-campaign.jpg",
+          },
+          tags: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["emergency", "shelter", "families"],
+          },
+        },
+      },
+      DonationCampaignUpdateInput: {
+        type: "object",
+        properties: {
+          title: {
+            type: "string",
+            example: "Updated Emergency Shelter Fund",
+          },
+          description: {
+            type: "string",
+            example: "Updated description for our emergency shelter campaign",
+          },
+          goal: {
+            type: "number",
+            example: 7500.00,
+          },
+          endDate: {
+            type: "string",
+            format: "date",
+            example: "2024-03-31",
+          },
+          isActive: {
+            type: "boolean",
+            example: true,
+          },
+          suggestedAmounts: {
+            type: "array",
+            items: {
+              type: "number",
+            },
+            example: [15, 30, 50, 100, 300],
+          },
+          featuredImage: {
+            type: "string",
+            example: "https://example.com/images/updated-campaign.jpg",
+          },
+          tags: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["emergency", "shelter", "families", "housing"],
+          },
+        },
+      },
+      DonationTransactionInput: {
+        type: "object",
+        required: ["amount", "currency", "paymentMethod"],
+        properties: {
+          donorName: {
+            type: "string",
+            example: "John Doe",
+          },
+          donorEmail: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          amount: {
+            type: "number",
+            example: 50.00,
+          },
+          currency: {
+            type: "string",
+            example: "USD",
+          },
+          isAnonymous: {
+            type: "boolean",
+            example: false,
+          },
+          message: {
+            type: "string",
+            example: "Thank you for your important work!",
+          },
+          paymentMethod: {
+            type: "string",
+            enum: ["credit_card", "paypal", "bank_transfer", "crypto"],
+            example: "credit_card",
+          },
+          paymentDetails: {
+            type: "object",
+            example: {
+              cardNumber: "4111111111111111",
+              expiryMonth: "12",
+              expiryYear: "2024",
+              cvv: "123",
+            },
+          },
+        },
+      },
+      DonationTransaction: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "tx-789",
+          },
+          campaignId: {
+            type: "string",
+            example: "campaign-123",
+          },
+          donorName: {
+            type: "string",
+            example: "John Doe",
+          },
+          donorEmail: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          amount: {
+            type: "number",
+            example: 50.00,
+          },
+          currency: {
+            type: "string",
+            example: "USD",
+          },
+          isAnonymous: {
+            type: "boolean",
+            example: false,
+          },
+          message: {
+            type: "string",
+            example: "Thank you for your important work!",
+          },
+          paymentMethod: {
+            type: "string",
+            example: "credit_card",
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "completed", "failed", "refunded"],
+            example: "completed",
+          },
+          transactionDate: {
+            type: "string",
+            format: "date-time",
+            example: "2023-06-15T14:30:00Z",
           },
         },
       },
@@ -5075,13 +5394,643 @@ const apiSpec = {
         },
       },
     },
+    "/api/v1/donations": {
+      get: {
+        summary: "List all donations",
+        description: "Returns a list of active donation campaigns",
+        tags: ["donations"],
+        security: [{ apiKey: [] }],
+        parameters: [
+          {
+            name: "organizationId",
+            in: "query",
+            description: "Filter by organization ID",
+            required: false,
+            schema: {
+              type: "string",
+            },
+          },
+          {
+            name: "status",
+            in: "query",
+            description: "Filter by status (active, completed, archived)",
+            required: false,
+            schema: {
+              type: "string",
+              enum: ["active", "completed", "archived"],
+            },
+          },
+          {
+            name: "type",
+            in: "query",
+            description: "Filter by type (monetary, supplies, volunteer)",
+            required: false,
+            schema: {
+              type: "string",
+              enum: ["monetary", "supplies", "volunteer"],
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "A list of donation campaigns",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/DonationCampaign",
+                      },
+                    },
+                    pagination: {
+                      $ref: "#/components/schemas/Pagination",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        summary: "Create a new donation campaign",
+        description: "Creates a new donation campaign",
+        tags: ["donations"],
+        security: [
+          { apiKey: [], bearerAuth: [] },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/DonationCampaignInput",
+              },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Donation campaign created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      $ref: "#/components/schemas/DonationCampaign",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Bad Request",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/v1/donations/{id}": {
+      get: {
+        summary: "Get donation by ID",
+        description: "Returns details for a specific donation campaign",
+        tags: ["donations"],
+        security: [{ apiKey: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Donation campaign ID",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Donation campaign details",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      $ref: "#/components/schemas/DonationCampaign",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "404": {
+            description: "Donation campaign not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      put: {
+        summary: "Update donation",
+        description: "Updates an existing donation campaign",
+        tags: ["donations"],
+        security: [
+          { apiKey: [], bearerAuth: [] },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Donation campaign ID",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/DonationCampaignUpdateInput",
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Donation campaign updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      $ref: "#/components/schemas/DonationCampaign",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Bad Request",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "404": {
+            description: "Donation campaign not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        summary: "Delete donation",
+        description: "Deletes a donation campaign",
+        tags: ["donations"],
+        security: [
+          { apiKey: [], bearerAuth: [] },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Donation campaign ID",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Donation campaign deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                      example: "Donation campaign deleted successfully",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "404": {
+            description: "Donation campaign not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/v1/donations/{id}/donate": {
+      post: {
+        summary: "Make a donation",
+        description: "Process a donation for a specific campaign",
+        tags: ["donations"],
+        security: [{ apiKey: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Donation campaign ID",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/DonationTransactionInput",
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Donation processed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      $ref: "#/components/schemas/DonationTransaction",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Bad Request",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "404": {
+            description: "Donation campaign not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/v1/admin/donations/{id}/transactions": {
+      get: {
+        summary: "Get donation transactions",
+        description: "Returns transactions for a specific donation campaign",
+        tags: ["donations", "admin"],
+        security: [
+          { apiKey: [], bearerAuth: [] },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Donation campaign ID",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "List of donation transactions",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/DonationTransaction",
+                      },
+                    },
+                    pagination: {
+                      $ref: "#/components/schemas/Pagination",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "404": {
+            description: "Donation campaign not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/v1/admin/donations/analytics": {
+      get: {
+        summary: "Get donation analytics",
+        description: "Returns analytics data for all donation campaigns",
+        tags: ["donations", "admin", "analytics"],
+        security: [
+          { apiKey: [], bearerAuth: [] },
+        ],
+        responses: {
+          "200": {
+            description: "Donation analytics data",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "object",
+                      properties: {
+                        totalDonations: {
+                          type: "number",
+                          example: 25000,
+                        },
+                        activeCampaigns: {
+                          type: "number",
+                          example: 5,
+                        },
+                        totalDonors: {
+                          type: "number",
+                          example: 187,
+                        },
+                        averageDonation: {
+                          type: "number",
+                          example: 133.69,
+                        },
+                        topCampaigns: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              id: {
+                                type: "string",
+                                example: "campaign-123",
+                              },
+                              title: {
+                                type: "string",
+                                example: "Emergency Shelter Fund",
+                              },
+                              totalRaised: {
+                                type: "number",
+                                example: 7500,
+                              },
+                              donationCount: {
+                                type: "number",
+                                example: 42,
+                              },
+                            },
+                          },
+                        },
+                        donationsByPeriod: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              period: {
+                                type: "string",
+                                example: "2023-06",
+                              },
+                              amount: {
+                                type: "number",
+                                example: 3200,
+                              },
+                              count: {
+                                type: "number",
+                                example: 28,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          "500": {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 };
 
 // Routes
 router.get("/api-docs", (ctx) => {
-  ctx.response.headers.set("Content-Type", "text/html");
   ctx.response.body = redocUi;
+  ctx.response.type = "text/html";
+});
+
+router.get("/api-docs.json", (ctx) => {
+  ctx.response.body = apiSpec;
+  ctx.response.type = "application/json";
 });
 
 // Serve static files for ReDoc
@@ -5117,5 +6066,8 @@ router.get("/api-docs.json", (ctx) => {
     ctx.response.body = { error: "Failed to serve API specification" };
   }
 });
+
+// Export the router with a named export for better imports
+export { router as swaggerRouter };
 
 export default router;

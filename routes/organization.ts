@@ -7,7 +7,7 @@ import {
   sanitizeHtml,
   validateInput,
 } from "../middleware/validation.ts";
-import { requireAuth } from "../middleware/auth.ts";
+import { verifyToken } from "../middleware/auth.ts";
 import {
   createBranch,
   createOrganization,
@@ -399,7 +399,7 @@ publicRouter.get("/:id/locations", async (ctx) => {
 });
 
 // Admin routes (auth required)
-adminRouter.post("/", requireAuth, async (ctx) => {
+adminRouter.post("/", verifyToken, async (ctx) => {
   try {
     const data = ctx.state.body as CreateOrganizationRequest;
     const organization = await createOrganization(data);
@@ -415,7 +415,7 @@ adminRouter.post("/", requireAuth, async (ctx) => {
 });
 
 // Update an organization
-adminRouter.put("/:id", requireAuth, async (ctx) => {
+adminRouter.put("/:id", verifyToken, async (ctx) => {
   try {
     const { id } = ctx.params;
     const data = ctx.state.body as UpdateOrganizationRequest;
@@ -436,7 +436,7 @@ adminRouter.put("/:id", requireAuth, async (ctx) => {
 });
 
 // Delete an organization
-adminRouter.delete("/:id", requireAuth, async (ctx) => {
+adminRouter.delete("/:id", verifyToken, async (ctx) => {
   try {
     const { id } = ctx.params;
     const success = await deleteOrganization(id);
@@ -456,7 +456,7 @@ adminRouter.delete("/:id", requireAuth, async (ctx) => {
 });
 
 // Branch routes (admin only)
-adminRouter.post("/:organizationId/branches", requireAuth, async (ctx) => {
+adminRouter.post("/:organizationId/branches", verifyToken, async (ctx) => {
   try {
     const { organizationId } = ctx.params;
     const data = ctx.state.body as CreateBranchRequest;
@@ -479,7 +479,7 @@ adminRouter.post("/:organizationId/branches", requireAuth, async (ctx) => {
 
 adminRouter.put(
   "/:organizationId/branches/:branchId",
-  requireAuth,
+  verifyToken,
   async (ctx) => {
     try {
       const { branchId } = ctx.params;
@@ -503,7 +503,7 @@ adminRouter.put(
 
 adminRouter.delete(
   "/:organizationId/branches/:branchId",
-  requireAuth,
+  verifyToken,
   async (ctx) => {
     try {
       const { branchId } = ctx.params;

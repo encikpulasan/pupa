@@ -2,7 +2,7 @@
 
 import { Router } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { generateId, getKv, KV_COLLECTIONS } from "../db/kv.ts";
-import { requireAuth } from "../middleware/auth.ts";
+import { verifyToken } from "../middleware/auth.ts";
 import {
   requirePermission,
   requireUserType,
@@ -20,7 +20,7 @@ export const publicRouter = new Router();
 export const adminRouter = new Router();
 
 // Apply authentication middleware to admin routes
-adminRouter.use(requireAuth);
+adminRouter.use(verifyToken);
 
 // Register a new patron (public route)
 publicRouter.post("/register", async (ctx) => {

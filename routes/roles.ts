@@ -2,7 +2,7 @@
 
 import { Router } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { generateId, getKv, KV_COLLECTIONS } from "../db/kv.ts";
-import { requireAuth } from "../middleware/auth.ts";
+import { verifyToken } from "../middleware/auth.ts";
 import { requirePermission } from "../middleware/permissions.ts";
 import {
   AccessLevel,
@@ -14,7 +14,7 @@ import {
 const router = new Router();
 
 // Apply authentication middleware
-router.use(requireAuth);
+router.use(verifyToken);
 
 // Initialize system roles in the database
 export async function initializeRoles(): Promise<void> {

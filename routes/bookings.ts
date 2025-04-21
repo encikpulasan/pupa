@@ -3,7 +3,7 @@
 import { Router } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { generateId, getKv, KV_COLLECTIONS } from "../db/kv.ts";
 import { sanitizeHtml } from "../middleware/validation.ts";
-import { requireAuth } from "../middleware/auth.ts";
+import { verifyToken } from "../middleware/auth.ts";
 
 // Public router - no authentication required for these routes
 export const publicRouter = new Router();
@@ -12,7 +12,7 @@ export const publicRouter = new Router();
 export const adminRouter = new Router();
 
 // Apply authentication middleware to all admin routes
-adminRouter.use(requireAuth);
+adminRouter.use(verifyToken);
 
 // Create a new booking (public)
 publicRouter.post("/", async (ctx) => {

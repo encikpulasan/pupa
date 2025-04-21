@@ -1,11 +1,18 @@
 import { Router } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { getDashboardAnalytics } from "../services/dashboardAnalytics.ts";
-import { requireAuth } from "../middleware/auth.ts";
+import { verifyToken } from "../middleware/auth.ts";
 
-const router = new Router();
+// Public router - no authentication required for these routes
+export const publicRouter = new Router();
 
-// Get all dashboard analytics
-router.get("/", requireAuth, async (ctx) => {
+// Admin router - authentication required for these routes
+export const adminRouter = new Router();
+
+// Apply authentication middleware to all admin routes
+adminRouter.use(verifyToken);
+
+// Get all dashboard analytics (admin)
+adminRouter.get("/", async (ctx) => {
   try {
     const analytics = await getDashboardAnalytics();
     ctx.response.body = analytics;
@@ -17,5 +24,3 @@ router.get("/", requireAuth, async (ctx) => {
     };
   }
 });
-
-export default router;

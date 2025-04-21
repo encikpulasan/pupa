@@ -31,6 +31,18 @@ to:
   security
 - **Password Management**: Secure password hashing and change functionality
 
+### Donation System
+
+- **Campaign Management**: Create, track, and manage donation campaigns
+- **Multiple Donation Types**: Support for various donation types (monetary,
+  supplies, volunteer time)
+- **Transaction Processing**: Handle individual donations with receipt
+  generation
+- **Campaign Analytics**: Track progress and success rates for donation
+  campaigns
+- **Organization Integration**: Link donations to specific organizations or
+  branches
+
 ### User Management
 
 - **Administrative User Controls**: Create, read, update, and delete admin users

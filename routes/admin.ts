@@ -4,11 +4,19 @@ import { Router } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 import { generateId, getKv, KV_COLLECTIONS } from "../db/kv.ts";
 import { userSchema, validateInput } from "../middleware/validation.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { verifyToken } from "../middleware/auth.ts";
 
-const router = new Router();
+// Public router - no authentication required for these routes
+export const publicRouter = new Router();
+
+// Admin router - authentication required for these routes
+export const adminRouter = new Router();
+
+// Apply authentication middleware to all admin routes
+adminRouter.use(verifyToken);
 
 // Get all admin users
-router.get("/users", async (ctx) => {
+adminRouter.get("/users", async (ctx) => {
   const kv = getKv();
   const entries = kv.list<any>({ prefix: [KV_COLLECTIONS.USERS] });
 
@@ -23,7 +31,7 @@ router.get("/users", async (ctx) => {
 });
 
 // Get admin user by ID
-router.get("/users/:id", async (ctx) => {
+adminRouter.get("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   if (!id) {
     ctx.response.status = 400;
@@ -46,7 +54,7 @@ router.get("/users/:id", async (ctx) => {
 });
 
 // Create new admin user
-router.post("/users", validateInput(userSchema), async (ctx) => {
+adminRouter.post("/users", validateInput(userSchema), async (ctx) => {
   const userData = ctx.state.body;
 
   // Check if user with the same email already exists
@@ -94,7 +102,7 @@ router.post("/users", validateInput(userSchema), async (ctx) => {
 });
 
 // Update admin user
-router.put("/users/:id", async (ctx) => {
+adminRouter.put("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   if (!id) {
     ctx.response.status = 400;
@@ -167,7 +175,7 @@ router.put("/users/:id", async (ctx) => {
 });
 
 // Delete admin user
-router.delete("/users/:id", async (ctx) => {
+adminRouter.delete("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   if (!id) {
     ctx.response.status = 400;
@@ -191,7 +199,7 @@ router.delete("/users/:id", async (ctx) => {
 });
 
 // Generate API key for admin
-router.post("/api-keys", async (ctx) => {
+adminRouter.post("/api-keys", async (ctx) => {
   const { userId, description } = ctx.state.body;
 
   if (!userId || !description) {
@@ -228,7 +236,7 @@ router.post("/api-keys", async (ctx) => {
 });
 
 // Get all API keys
-router.get("/api-keys", async (ctx) => {
+adminRouter.get("/api-keys", async (ctx) => {
   const kv = getKv();
   const entries = kv.list<any>({ prefix: [KV_COLLECTIONS.API_KEYS] });
 
@@ -241,7 +249,7 @@ router.get("/api-keys", async (ctx) => {
 });
 
 // Revoke API key
-router.delete("/api-keys/:key", async (ctx) => {
+adminRouter.delete("/api-keys/:key", async (ctx) => {
   const { key } = ctx.params;
   if (!key) {
     ctx.response.status = 400;
@@ -263,5 +271,3 @@ router.delete("/api-keys/:key", async (ctx) => {
 
   ctx.response.status = 204; // No Content
 });
-
-export default router;

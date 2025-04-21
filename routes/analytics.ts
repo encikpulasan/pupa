@@ -7,11 +7,19 @@ import {
   getPostAnalytics,
   getTrendingPosts,
 } from "../services/analytics.ts";
+import { verifyToken } from "../middleware/auth.ts";
 
-const router = new Router({ prefix: "/api/admin/analytics" });
+// Public router - no authentication required for these routes
+export const publicRouter = new Router();
 
-// Get dashboard analytics
-router.get("/dashboard", async (ctx) => {
+// Admin router - authentication required for these routes
+export const adminRouter = new Router();
+
+// Apply authentication middleware to all admin routes
+adminRouter.use(verifyToken);
+
+// Get dashboard analytics (admin)
+adminRouter.get("/dashboard", async (ctx) => {
   try {
     const summary = await getAnalyticsSummary();
     const trending = await getTrendingPosts(5);
@@ -30,8 +38,8 @@ router.get("/dashboard", async (ctx) => {
   }
 });
 
-// Get analytics for a specific post
-router.get("/posts/:id", async (ctx) => {
+// Get analytics for a specific post (admin)
+adminRouter.get("/posts/:id", async (ctx) => {
   const { id } = ctx.params;
 
   try {
@@ -46,8 +54,8 @@ router.get("/posts/:id", async (ctx) => {
   }
 });
 
-// Get trending posts
-router.get("/trending", async (ctx) => {
+// Get trending posts (admin)
+adminRouter.get("/trending", async (ctx) => {
   try {
     const limit = ctx.request.url.searchParams.get("limit");
     const trending = await getTrendingPosts(limit ? parseInt(limit) : 5);
@@ -61,8 +69,8 @@ router.get("/trending", async (ctx) => {
   }
 });
 
-// Get post analytics over time
-router.get("/posts/:id/timeline", async (ctx) => {
+// Get post analytics over time (admin)
+adminRouter.get("/posts/:id/timeline", async (ctx) => {
   const { id } = ctx.params;
   const kv = getKv();
   const post = await kv.get<any>([KV_COLLECTIONS.POSTS, id]);
@@ -130,8 +138,8 @@ router.get("/posts/:id/timeline", async (ctx) => {
   };
 });
 
-// Get analytics comparison between posts
-router.get("/compare", async (ctx) => {
+// Get analytics comparison between posts (admin)
+adminRouter.get("/compare", async (ctx) => {
   const postIds = ctx.request.url.searchParams.get("ids")?.split(",") || [];
   const kv = getKv();
 
@@ -165,8 +173,8 @@ router.get("/compare", async (ctx) => {
   }
 });
 
-// Get real-time analytics (last hour)
-router.get("/realtime", async (ctx) => {
+// Get real-time analytics (last hour) (admin)
+adminRouter.get("/realtime", async (ctx) => {
   const kv = getKv();
   const entries = kv.list<any>({ prefix: [KV_COLLECTIONS.POSTS] });
   const now = new Date();
@@ -230,5 +238,3 @@ router.get("/realtime", async (ctx) => {
     timestamp: now.toISOString(),
   };
 });
-
-export default router;

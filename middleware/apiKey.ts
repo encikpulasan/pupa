@@ -1,71 +1,104 @@
-// middleware/apiKey.ts - API Key validation
+// middleware/apiKey.ts - API key validation middleware
 
-import { Context, Next } from "https://deno.land/x/oak@v12.5.0/mod.ts";
+import { Middleware } from "https://deno.land/x/oak@v12.5.0/middleware.ts";
 import { getKv, KV_COLLECTIONS } from "../db/kv.ts";
-import { logSuspiciousActivity } from "./logging.ts";
+
+// Define the API key data interface
+interface ApiKeyData {
+  key: string;
+  userId: string;
+  description: string;
+  createdAt: string;
+  lastUsed: string | null;
+}
 
 /**
- * Validate API key for all API requests
+ * Middleware to validate API key
+ * Verifies the API key is valid and updates last used timestamp
  */
-export async function validateApiKey(ctx: Context, next: Next) {
-  // Skip validation for public endpoints
-  if (ctx.request.url.pathname.startsWith("/api/public")) {
-    return await next();
-  }
+export const validateApiKey: Middleware = async (ctx, next) => {
+  try {
+    const apiKey = ctx.request.headers.get("X-API-Key");
 
-  const apiKey = ctx.request.headers.get("X-API-Key");
-
-  // Health check requires API key but with a simpler validation
-  if (ctx.request.url.pathname === "/health") {
     if (!apiKey) {
       ctx.response.status = 401;
-      ctx.response.headers.set("Content-Type", "application/json");
-      ctx.response.body = { error: "API Key required" };
+      ctx.response.body = {
+        success: false,
+        message: "API key is required",
+      };
       return;
     }
-    return await next();
-  }
 
-  if (!apiKey) {
-    ctx.response.status = 401;
-    ctx.response.headers.set("Content-Type", "application/json");
-    ctx.response.body = { error: "API Key required" };
-    return;
-  }
+    const kv = getKv();
+    const result = await kv.get<ApiKeyData>([KV_COLLECTIONS.API_KEYS, apiKey]);
 
-  // For development, accept the API key from .env file
-  const envApiKey = Deno.env.get("API_KEY");
-  if (envApiKey && apiKey === envApiKey) {
-    // Create dummy API key data for context
-    ctx.state.apiKeyData = {
-      key: apiKey,
-      userId: "dev-user",
-      description: "Development API Key",
-      createdAt: new Date().toISOString(),
-      lastUsed: new Date().toISOString(),
+    if (!result.value) {
+      ctx.response.status = 401;
+      ctx.response.body = {
+        success: false,
+        message: "Invalid API key",
+      };
+      return;
+    }
+
+    // Update last used timestamp
+    const apiKeyData = { ...result.value };
+    apiKeyData.lastUsed = new Date().toISOString();
+    await kv.set([KV_COLLECTIONS.API_KEYS, apiKey], apiKeyData);
+
+    // Store API key in context for later use
+    ctx.state.apiKey = apiKeyData;
+
+    await next();
+  } catch (error) {
+    ctx.response.status = 500;
+    ctx.response.body = {
+      success: false,
+      message: "Error validating API key",
+      error: error instanceof Error ? error.message : "Unknown error",
     };
-    return await next();
   }
+};
 
-  const kv = getKv();
-  const apiKeyData = await kv.get([KV_COLLECTIONS.API_KEYS, apiKey]);
+/**
+ * Middleware to verify API key for routes that require it
+ * Similar to validateApiKey but specifically for the donation routes
+ */
+export const verifyApiKey: Middleware = async (ctx, next) => {
+  try {
+    const apiKey = ctx.request.headers.get("X-API-Key");
 
-  if (!apiKeyData.value) {
-    ctx.response.status = 401;
-    ctx.response.body = { error: "Invalid API Key" };
+    if (!apiKey) {
+      ctx.response.status = 401;
+      ctx.response.body = {
+        success: false,
+        message: "API key is required",
+      };
+      return;
+    }
 
-    // Log suspicious activity - invalid API key
-    logSuspiciousActivity({
-      type: "INVALID_API_KEY",
-      ip: ctx.request.ip,
-      path: ctx.request.url.pathname,
-    });
+    const kv = getKv();
+    const result = await kv.get<ApiKeyData>([KV_COLLECTIONS.API_KEYS, apiKey]);
 
-    return;
+    if (!result.value) {
+      ctx.response.status = 401;
+      ctx.response.body = {
+        success: false,
+        message: "Invalid API key",
+      };
+      return;
+    }
+
+    // Store API key data in context
+    ctx.state.apiKey = result.value;
+
+    await next();
+  } catch (error) {
+    ctx.response.status = 500;
+    ctx.response.body = {
+      success: false,
+      message: "Error verifying API key",
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
-
-  // Store API key data in context state for later use
-  ctx.state.apiKeyData = apiKeyData.value;
-
-  await next();
-}
+};

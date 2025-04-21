@@ -55,6 +55,11 @@ export const KV_COLLECTIONS = {
   ROLES: "roles",
   PERMISSIONS: "permissions",
 
+  // Donation-related collections
+  DONATIONS: "donations",
+  DONATION_TRANSACTIONS: "donation_transactions",
+  DONATION_ANALYTICS: "donation_analytics",
+
   // New simplified analytics collections
   API_EVENTS: "api_events",
   API_METRICS: "api_metrics",

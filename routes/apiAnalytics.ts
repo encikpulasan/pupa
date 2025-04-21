@@ -7,11 +7,19 @@ import {
   getApiUsageSummary,
   getEndpointMetrics,
 } from "../services/apiAnalytics.ts";
+import { verifyToken } from "../middleware/auth.ts";
 
-const router = new Router({ prefix: "/analytics" });
+// Public router - no authentication required for these routes
+export const publicRouter = new Router();
 
-// Get API usage summary
-router.get("/summary", async (ctx) => {
+// Admin router - authentication required for these routes
+export const adminRouter = new Router();
+
+// Apply authentication middleware to all admin routes
+adminRouter.use(verifyToken);
+
+// Get API usage summary (admin)
+adminRouter.get("/summary", async (ctx) => {
   try {
     const timeframe = ctx.request.url.searchParams.get("timeframe") as
       | "hourly"
@@ -32,8 +40,8 @@ router.get("/summary", async (ctx) => {
   }
 });
 
-// Get endpoint metrics
-router.get("/endpoints/:endpoint", async (ctx) => {
+// Get endpoint metrics (admin)
+adminRouter.get("/endpoints/:endpoint", async (ctx) => {
   try {
     const endpoint = ctx.params.endpoint;
     const timeframe = ctx.request.url.searchParams.get("timeframe") as
@@ -61,8 +69,8 @@ router.get("/endpoints/:endpoint", async (ctx) => {
   }
 });
 
-// Get error summary
-router.get("/errors", async (ctx) => {
+// Get error summary (admin)
+adminRouter.get("/errors", async (ctx) => {
   try {
     const timeframe = ctx.request.url.searchParams.get("timeframe") as
       | "hourly"
@@ -83,8 +91,8 @@ router.get("/errors", async (ctx) => {
   }
 });
 
-// Get per-endpoint error summary
-router.get("/errors/:endpoint", async (ctx) => {
+// Get per-endpoint error summary (admin)
+adminRouter.get("/errors/:endpoint", async (ctx) => {
   try {
     const endpoint = ctx.params.endpoint;
 
@@ -122,5 +130,3 @@ router.get("/errors/:endpoint", async (ctx) => {
     };
   }
 });
-
-export default router;

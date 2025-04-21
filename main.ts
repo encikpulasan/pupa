@@ -2,38 +2,54 @@
 
 import {
   Application,
-  Context,
+  // Context,
   isHttpError,
   Router,
   send,
 } from "https://deno.land/x/oak@v12.5.0/mod.ts";
+// import { create, verify } from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
-import { Status } from "https://deno.land/std@0.185.0/http/http_status.ts";
-import { create, verify } from "https://deno.land/x/djwt@v2.8/mod.ts";
+// import { Status } from "https://deno.land/std@0.185.0/http/http_status.ts";
 import { load } from "https://deno.land/std@0.185.0/dotenv/mod.ts";
+
+// API routers
+import adminRouter from "./routes/api/admin.ts";
+import authRouter from "./routes/api/auth.ts";
+import * as donationRoutes from "./routes/donations.ts";
+import organizationRouter from "./routes/api/organization.ts";
+import postRouter from "./routes/api/post.ts";
+
+// Core routes
+import * as adminRoutes from "./routes/admin.ts";
+import * as apiAnalyticsRoutes from "./routes/apiAnalytics.ts";
+import authRoutes from "./routes/auth.ts";
+import * as dashboardAnalyticsRoutes from "./routes/dashboardAnalytics.ts";
+import dbViewerRoutes from "./db-viewer.ts";
+import * as bookingRoutes from "./routes/bookings.ts";
+import * as patronRoutes from "./routes/patrons.ts";
+import organizationRoutes from "./routes/organization.ts";
+import postRoutes from "./routes/posts.ts";
+import rolesRoutes, { initializeRoles } from "./routes/roles.ts";
+import * as analyticsRoutes from "./routes/analytics.ts";
+import { swaggerRouter } from "./swagger.ts";
+
+// Services
 import { connect, getKv, KV_COLLECTIONS } from "./db/kv.ts";
+import { getPostAnalytics, trackView } from "./services/analytics.ts";
+import { initializeScheduler } from "./services/scheduler.ts";
+
+// Middleware
+import { apiMetrics } from "./middleware/apiMetrics.ts";
 import { logRequest, logSuspiciousActivity } from "./middleware/logging.ts";
 import { rateLimiter } from "./middleware/rateLimiter.ts";
-import { validateApiKey } from "./middleware/apiKey.ts";
 import { securityHeaders } from "./middleware/securityHeaders.ts";
-import { apiMetrics } from "./middleware/apiMetrics.ts";
-import adminRoutes from "./routes/admin.ts";
-import postRoutes from "./routes/posts.ts";
-import organizationRoutes from "./routes/organization.ts";
-// import analyticsRoutes from "./routes/analytics.ts";
-// import auditRoutes from "./routes/audit.ts";
-import authRoutes from "./routes/auth.ts";
-import apiAnalyticsRoutes from "./routes/apiAnalytics.ts";
-import swaggerRoutes from "./swagger.ts";
-import dbViewerRoutes from "./db-viewer.ts";
-import { initializeScheduler } from "./services/scheduler.ts";
-import { getPostAnalytics, trackView } from "./services/analytics.ts";
-import dashboardAnalyticsRoutes from "./routes/dashboardAnalytics.ts";
+import { validateApiKey } from "./middleware/apiKey.ts";
+
+// Utilities
 import { hashPassword } from "./utils/password.ts";
-import * as bookingRoutes from "./routes/bookings.ts";
-import rolesRoutes, { initializeRoles } from "./routes/roles.ts";
-import * as patronRoutes from "./routes/patrons.ts";
-import { UserType } from "./types/user.ts";
+
+// Types
+import { User, UserType } from "./types/user.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -56,10 +72,10 @@ await initializeScheduler();
 // Function to initialize admin user if none exists
 async function initAdminUser() {
   const kv = getKv();
-  const entries = kv.list<any>({ prefix: [KV_COLLECTIONS.USERS] });
+  const entries = kv.list<User>({ prefix: [KV_COLLECTIONS.USERS] });
   let userExists = false;
 
-  for await (const entry of entries) {
+  for await (const _entry of entries) {
     userExists = true;
     break;
   }
@@ -211,8 +227,8 @@ app.use(async (ctx, next) => {
 });
 
 // Mount Swagger documentation routes (before API key validation)
-app.use(swaggerRoutes.routes());
-app.use(swaggerRoutes.allowedMethods());
+app.use(swaggerRouter.routes());
+app.use(swaggerRouter.allowedMethods());
 
 // Mount database viewer routes (before API key validation)
 app.use(dbViewerRoutes.routes());
@@ -235,16 +251,19 @@ v1Router.use("/organizations", organizationRoutes.publicRouter.routes());
 v1Router.use("/posts", postRoutes.publicRouter.routes());
 v1Router.use("/bookings", bookingRoutes.publicRouter.routes());
 v1Router.use("/patrons", patronRoutes.publicRouter.routes());
+v1Router.use("/donations", donationRoutes.publicRouter.routes());
 
 // Admin routes (protected)
-v1Router.use("/admin", adminRoutes.routes());
+v1Router.use("/admin", adminRoutes.adminRouter.routes());
 v1Router.use("/admin/posts", postRoutes.adminRouter.routes());
-v1Router.use("/admin/analytics", apiAnalyticsRoutes.routes());
-v1Router.use("/admin/dashboard", dashboardAnalyticsRoutes.routes());
+v1Router.use("/admin/analytics", analyticsRoutes.adminRouter.routes());
+v1Router.use("/admin/analytics/api", apiAnalyticsRoutes.adminRouter.routes());
+v1Router.use("/admin/dashboard", dashboardAnalyticsRoutes.adminRouter.routes());
 v1Router.use("/admin/organizations", organizationRoutes.adminRouter.routes());
 v1Router.use("/admin/bookings", bookingRoutes.adminRouter.routes());
 v1Router.use("/admin/roles", rolesRoutes.routes());
 v1Router.use("/admin/patrons", patronRoutes.adminRouter.routes());
+v1Router.use("/admin/donations", donationRoutes.adminRouter.routes());
 
 // Also add a test admin route directly
 v1Router.get("/admin/test", (ctx) => {
@@ -258,7 +277,6 @@ v1Router.get("/admin/direct-users", (ctx) => {
 
 // Debug logs
 console.log("Available Routes:");
-console.log("Admin routes prefix:", adminRoutes.prefix);
 console.log("V1 Router prefix:", v1Router.prefix);
 console.log("Auth routes prefix:", authRoutes.prefix);
 console.log("Posts routes:", "Public and Admin routes configured");
@@ -306,6 +324,16 @@ router.get("/api/analytics/posts/:id", async (ctx) => {
     ctx.response.body = { error: errorMessage };
   }
 });
+
+// Apply API routers
+app.use(authRouter.routes());
+app.use(authRouter.allowedMethods());
+app.use(postRouter.routes());
+app.use(postRouter.allowedMethods());
+app.use(organizationRouter.routes());
+app.use(organizationRouter.allowedMethods());
+app.use(adminRouter.routes());
+app.use(adminRouter.allowedMethods());
 
 // Error handling
 app.use(async (ctx, next) => {

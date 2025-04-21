@@ -1,6 +1,10 @@
 // services/scheduler.ts - Handles scheduled publishing of posts
 
 import { getKv, KV_COLLECTIONS } from "../db/kv.ts";
+import {
+  processEventDonations,
+  processRecurringDonations,
+} from "./donation.ts";
 
 /**
  * Check for and publish scheduled posts
@@ -45,4 +49,33 @@ export async function checkScheduledPosts() {
 export function initializeScheduler() {
   // Check for scheduled posts every minute
   setInterval(checkScheduledPosts, 60000);
+}
+
+/**
+ * Initialize all scheduler tasks
+ */
+export function initScheduler() {
+  // Schedule donation processing tasks
+
+  // Process recurring donations daily
+  Deno.cron("Process Recurring Donations", "0 0 * * *", async () => {
+    console.log("Running scheduled task: Process Recurring Donations");
+    try {
+      await processRecurringDonations();
+      console.log("Successfully processed recurring donations");
+    } catch (error) {
+      console.error("Error processing recurring donations:", error);
+    }
+  });
+
+  // Check for expired event donations daily
+  Deno.cron("Process Event Donations", "0 1 * * *", async () => {
+    console.log("Running scheduled task: Process Event Donations");
+    try {
+      await processEventDonations();
+      console.log("Successfully processed event donations");
+    } catch (error) {
+      console.error("Error processing event donations:", error);
+    }
+  });
 }
