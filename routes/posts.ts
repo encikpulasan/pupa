@@ -8,12 +8,16 @@ import {
   validateInput,
 } from "../middleware/validation.ts";
 import { logSuspiciousActivity } from "../middleware/logging.ts";
+import { verifyToken } from "../middleware/auth.ts";
 
 // Public router - no authentication required for these routes
 export const publicRouter = new Router();
 
 // Admin router - authentication required for these routes
 export const adminRouter = new Router();
+
+// Apply authentication middleware to all admin routes
+adminRouter.use(verifyToken);
 
 // Get all published posts (public)
 publicRouter.get("/", async (ctx) => {

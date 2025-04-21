@@ -34,6 +34,9 @@ const adminRouter = new Router();
 // Public routes
 const publicRouter = new Router();
 
+// Apply authentication middleware to all admin routes
+adminRouter.use(verifyToken);
+
 // Get organization info (admin)
 adminRouter.get("/", async (ctx) => {
   const kv = getKv();

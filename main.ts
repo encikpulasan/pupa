@@ -44,6 +44,7 @@ import { logRequest, logSuspiciousActivity } from "./middleware/logging.ts";
 import { rateLimiter } from "./middleware/rateLimiter.ts";
 import { securityHeaders } from "./middleware/securityHeaders.ts";
 import { validateApiKey } from "./middleware/apiKey.ts";
+import { rbac } from "./middleware/rbac.ts";
 
 // Utilities
 import { hashPassword } from "./utils/password.ts";
@@ -160,6 +161,9 @@ app.use(
 app.use(logRequest);
 app.use(apiMetrics);
 app.use(rateLimiter);
+
+// Apply RBAC middleware to all requests
+app.use(rbac);
 
 // Body parser with size limits
 app.use(async (ctx, next) => {

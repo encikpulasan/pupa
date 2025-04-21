@@ -25,6 +25,7 @@ export enum ResourceType {
   BOOKINGS = "bookings",
   ANALYTICS = "analytics",
   SETTINGS = "settings",
+  DONATIONS = "donations",
 }
 
 // Permission definition for a specific resource
@@ -95,6 +96,7 @@ export const SYSTEM_ROLES: Role[] = [
         accessLevel: AccessLevel.READ_ONLY,
       },
       { resource: ResourceType.ANALYTICS, accessLevel: AccessLevel.READ_ONLY },
+      { resource: ResourceType.DONATIONS, accessLevel: AccessLevel.READ_ONLY },
     ],
     isSystemRole: true,
   },
@@ -103,6 +105,20 @@ export const SYSTEM_ROLES: Role[] = [
     description: "Manage booking requests",
     permissions: [
       { resource: ResourceType.BOOKINGS, accessLevel: AccessLevel.FULL },
+      { resource: ResourceType.USERS, accessLevel: AccessLevel.READ_ONLY },
+      { resource: ResourceType.DONATIONS, accessLevel: AccessLevel.READ_ONLY },
+    ],
+    isSystemRole: true,
+  },
+  {
+    name: "DonationManager",
+    description: "Manage donations",
+    permissions: [
+      { resource: ResourceType.DONATIONS, accessLevel: AccessLevel.FULL },
+      {
+        resource: ResourceType.ORGANIZATIONS,
+        accessLevel: AccessLevel.READ_ONLY,
+      },
       { resource: ResourceType.USERS, accessLevel: AccessLevel.READ_ONLY },
     ],
     isSystemRole: true,
@@ -117,6 +133,7 @@ export const SYSTEM_ROLES: Role[] = [
         resource: ResourceType.ORGANIZATIONS,
         accessLevel: AccessLevel.READ_ONLY,
       },
+      { resource: ResourceType.DONATIONS, accessLevel: AccessLevel.READ_WRITE },
     ],
     isSystemRole: true,
   },
@@ -129,6 +146,7 @@ export const SYSTEM_ROLES: Role[] = [
         resource: ResourceType.ORGANIZATIONS,
         accessLevel: AccessLevel.READ_ONLY,
       },
+      { resource: ResourceType.DONATIONS, accessLevel: AccessLevel.READ_ONLY },
     ],
     isSystemRole: true,
   },

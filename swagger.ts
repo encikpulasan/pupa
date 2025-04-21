@@ -201,11 +201,13 @@ const apiSpec = {
         type: "apiKey",
         in: "header",
         name: "X-API-Key",
+        description: "API key for authentication",
       },
       BearerAuth: {
         type: "http",
         scheme: "bearer",
         bearerFormat: "JWT",
+        description: "JWT token for authenticated users",
       },
     },
     schemas: {
@@ -865,6 +867,44 @@ const apiSpec = {
             example: "2023-06-15T14:30:00Z",
           },
         },
+      },
+      Pagination: {
+        type: "object",
+        properties: {
+          page: {
+            type: "integer",
+            description: "Current page number",
+            example: 1,
+            minimum: 1,
+          },
+          pageSize: {
+            type: "integer",
+            description: "Number of items per page",
+            example: 10,
+            minimum: 1,
+          },
+          totalItems: {
+            type: "integer",
+            description: "Total number of items",
+            example: 100,
+          },
+          totalPages: {
+            type: "integer",
+            description: "Total number of pages",
+            example: 10,
+          },
+          hasNextPage: {
+            type: "boolean",
+            description: "Whether there is a next page",
+            example: true,
+          },
+          hasPreviousPage: {
+            type: "boolean",
+            description: "Whether there is a previous page",
+            example: false,
+          },
+        },
+        required: ["page", "pageSize", "totalItems", "totalPages"],
       },
     },
   },
