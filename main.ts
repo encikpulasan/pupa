@@ -31,6 +31,9 @@ import { getPostAnalytics, trackView } from "./services/analytics.ts";
 import dashboardAnalyticsRoutes from "./routes/dashboardAnalytics.ts";
 import { hashPassword } from "./utils/password.ts";
 import * as bookingRoutes from "./routes/bookings.ts";
+import rolesRoutes, { initializeRoles } from "./routes/roles.ts";
+import * as patronRoutes from "./routes/patrons.ts";
+import { UserType } from "./types/user.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -43,6 +46,9 @@ await connect();
 
 // Initialize admin user if no users exist
 await initAdminUser();
+
+// Initialize system roles if they don't exist
+await initializeRoles();
 
 // Initialize the scheduler for scheduled posts
 await initializeScheduler();
@@ -70,7 +76,8 @@ async function initAdminUser() {
       username: "admin",
       email: "admin@charityshelter.org",
       password: hashedPassword,
-      role: "admin",
+      userType: UserType.ADMIN,
+      roles: ["SuperAdmin"], // Use SuperAdmin role from our roles system
       firstName: "Admin",
       lastName: "User",
       createdAt: new Date().toISOString(),
@@ -227,6 +234,7 @@ v1Router.use("/auth", authRoutes.routes());
 v1Router.use("/organizations", organizationRoutes.publicRouter.routes());
 v1Router.use("/posts", postRoutes.publicRouter.routes());
 v1Router.use("/bookings", bookingRoutes.publicRouter.routes());
+v1Router.use("/patrons", patronRoutes.publicRouter.routes());
 
 // Admin routes (protected)
 v1Router.use("/admin", adminRoutes.routes());
@@ -235,6 +243,8 @@ v1Router.use("/admin/analytics", apiAnalyticsRoutes.routes());
 v1Router.use("/admin/dashboard", dashboardAnalyticsRoutes.routes());
 v1Router.use("/admin/organizations", organizationRoutes.adminRouter.routes());
 v1Router.use("/admin/bookings", bookingRoutes.adminRouter.routes());
+v1Router.use("/admin/roles", rolesRoutes.routes());
+v1Router.use("/admin/patrons", patronRoutes.adminRouter.routes());
 
 // Also add a test admin route directly
 v1Router.get("/admin/test", (ctx) => {

@@ -19,6 +19,8 @@ to:
 - Implement robust authentication and authorization
 - Coordinate bookings for external organizations visiting the shelter or
   inviting children to events
+- Manage patron users (external organization representatives) with IAM-like
+  access controls
 
 ## Core Features
 
@@ -34,6 +36,10 @@ to:
 - **Administrative User Controls**: Create, read, update, and delete admin users
 - **Role-based Access**: Support for different user roles and permissions
 - **Audit Logging**: Track user activities and security events
+- **User Types**: Support for different user types including admin, editor,
+  patron, volunteer, and guest
+- **IAM-like Permission System**: AWS IAM-inspired access control with roles,
+  permissions, and resource-level restrictions
 
 ### Content Management
 
@@ -61,6 +67,23 @@ to:
 - **Status Tracking**: Monitor booking status through the entire lifecycle
 - **Public Status Checking**: Organizations can check their booking status
   without admin access
+
+### Patron System
+
+- **Patron Registration**: External organizations can register as patrons
+- **Verification Process**: Admin approval flow for new patron accounts
+- **Organization Integration**: Link patrons to their organizations
+- **Role Assignment**: Assign appropriate permissions to patrons
+
+### Role-Based Access Control
+
+- **Flexible Role System**: Create and manage roles with specific permissions
+- **Resource-Level Permissions**: Control access to different resources (users,
+  posts, organizations, bookings, etc.)
+- **Permission Levels**: Fine-grained access controls (full, read-write,
+  read-only, none)
+- **System Roles**: Pre-defined system roles with appropriate permissions
+- **Custom Roles**: Create custom roles for specific organizational needs
 
 ### Security Features
 
@@ -160,6 +183,17 @@ On first deployment, the application automatically creates a default admin user:
 **IMPORTANT**: For security reasons, change the default admin password
 immediately after first login.
 
+### Default Roles
+
+The system initializes with several predefined roles:
+
+- **SuperAdmin**: Full access to all resources
+- **ContentManager**: Manages posts and content with limited access to other
+  resources
+- **BookingManager**: Manages booking requests with read-only access to users
+- **Patron**: External organization representatives with booking access
+- **Guest**: Limited read-only access to public information
+
 ### Manual Database Initialization
 
 If needed, you can manually initialize the database with:
@@ -195,6 +229,7 @@ charity-shelter-api/
 - API endpoints are protected with rate limiting
 - Tokens are blacklisted on logout
 - All user actions are logged for audit purposes
+- IAM-style permission system limits access to resources
 
 ---
 
