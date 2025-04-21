@@ -39,7 +39,7 @@ async function initializeDeployment() {
       username: "admin",
       email: "admin@charityshelter.org",
       password: hashedPassword,
-      role: "admin",
+      role: "SuperAdmin",
       firstName: "Admin",
       lastName: "User",
       createdAt: new Date().toISOString(),

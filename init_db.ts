@@ -33,7 +33,7 @@ if (!adminExists) {
     username: "admin",
     email: "admin@example.com",
     password: hashedPassword,
-    role: "admin",
+    role: "SuperAdmin",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

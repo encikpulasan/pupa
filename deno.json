@@ -4,7 +4,9 @@
     "seed": "deno run --unstable-kv scripts/seed.ts",
     "export": "deno run --unstable-kv scripts/export_to_csv.ts",
     "import": "deno run --unstable-kv scripts/import_from_csv.ts",
-    "init": "deno run --unstable-kv -A scripts/init_deploy.ts"
+    "init": "deno run --unstable-kv -A scripts/init_deploy.ts",
+    "wipe-kv": "deno run --allow-env --allow-read --allow-write --allow-net --unstable-kv scripts/wipe-kv-data.ts",
+    "wipe-kv:dev": "deno run --allow-env --allow-read --allow-write --allow-net --unstable-kv scripts/wipe-kv-data-dev.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
