@@ -17,6 +17,8 @@ to:
 - Publish and manage posts/news updates
 - Track multiple organization locations
 - Implement robust authentication and authorization
+- Coordinate bookings for external organizations visiting the shelter or
+  inviting children to events
 
 ## Core Features
 
@@ -47,6 +49,18 @@ to:
 - **Multi-location Support**: Manage multiple physical locations/branches
 - **Contact Information**: Store addresses, phone numbers, emails for each
   location
+
+### Booking System
+
+- **Event Bookings**: External organizations can request to visit the shelter or
+  invite children to events
+- **Booking Management**: Admin interface to review, approve, reject, or cancel
+  booking requests
+- **Booking Types**: Support for different types of booking events (shelter
+  visits or inviting children)
+- **Status Tracking**: Monitor booking status through the entire lifecycle
+- **Public Status Checking**: Organizations can check their booking status
+  without admin access
 
 ### Security Features
 

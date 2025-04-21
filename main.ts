@@ -30,6 +30,7 @@ import { initializeScheduler } from "./services/scheduler.ts";
 import { getPostAnalytics, trackView } from "./services/analytics.ts";
 import dashboardAnalyticsRoutes from "./routes/dashboardAnalytics.ts";
 import { hashPassword } from "./utils/password.ts";
+import * as bookingRoutes from "./routes/bookings.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -225,6 +226,7 @@ v1Router.get("/test", (ctx) => {
 v1Router.use("/auth", authRoutes.routes());
 v1Router.use("/organizations", organizationRoutes.publicRouter.routes());
 v1Router.use("/posts", postRoutes.publicRouter.routes());
+v1Router.use("/bookings", bookingRoutes.publicRouter.routes());
 
 // Admin routes (protected)
 v1Router.use("/admin", adminRoutes.routes());
@@ -232,6 +234,7 @@ v1Router.use("/admin/posts", postRoutes.adminRouter.routes());
 v1Router.use("/admin/analytics", apiAnalyticsRoutes.routes());
 v1Router.use("/admin/dashboard", dashboardAnalyticsRoutes.routes());
 v1Router.use("/admin/organizations", organizationRoutes.adminRouter.routes());
+v1Router.use("/admin/bookings", bookingRoutes.adminRouter.routes());
 
 // Also add a test admin route directly
 v1Router.get("/admin/test", (ctx) => {

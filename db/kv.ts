@@ -51,6 +51,7 @@ export const KV_COLLECTIONS = {
   ANALYTICS: "analytics",
   SETTINGS: "settings",
   BLACKLISTED_TOKENS: "blacklisted_tokens",
+  BOOKINGS: "bookings",
 
   // New simplified analytics collections
   API_EVENTS: "api_events",
